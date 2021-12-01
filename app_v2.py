@@ -48,12 +48,16 @@ def create_connection():
             result.config(width = 60, height = 5)
             result2.config(width = 60, height = 5)
             cursor.execute("select table_name from user_tables order by table_name")
-            optionList = cursor.fetchall()        
+            optionList = cursor.fetchall()
+
             for string in optionList:
-                OPTIONS.append(string)
+                num = str(string).find(",",2)
+                val = str(string)[2:num-1]
+                OPTIONS.append(val)
             OPTIONS.remove("")
             updateMenu()
-    except:
+    except Exception as e:
+        print(e)
         #Login information was incorrect, exception was thrown, prompt user again
         ins["text"] = "Invalid username/password. Please Try Again"   
 
@@ -125,7 +129,7 @@ def alter_click():
 
     #Clears result Text if it isn't empty
     for str in values:
-        sql_alter = "INSERT INTO " + buffer[2:-3] + " (Name, Age) VALUES " + str
+        sql_alter = "INSERT INTO " + buffer + " (Name, Age) VALUES " + str
         
         try: 
             # #Checks if entry is a alter/insert command, else throws exception
@@ -161,6 +165,18 @@ def close_window():
 def on_entry_click(event):
     if input.get() == "Enter your command...":
         input.delete(0 , 'end')
+
+def on_back_click():
+    result.config(state = NORMAL)
+    if result.get('1.0',END) != '':
+                result.delete('1.0', END)
+    result.config(state = DISABLED)
+
+    result2.config(state = NORMAL)
+    if result2.get('1.0',END) != '':
+                result2.delete('1.0', END)
+    result2.config(state = DISABLED)
+    frameraise(mainwindow)
 
 def updateMenu ():
     tables_ddown["menu"].delete(0, "end")
@@ -214,7 +230,7 @@ exit_button = Button(mainwindow, text='Exit',width = 30, command=exit_click) #Th
 #result1 = Text(mainwindow, wrap= WORD, height =0, width = 0, state = DISABLED)
 
 #Creating the GUI for query page
-back_button = Button(query_page, text='Back', width=30, command=lambda : frameraise(mainwindow))
+back_button = Button(query_page, text='Back', width=30, command= on_back_click)
 query_button = Button(query_page, text='Query', width = 30, command=query_click) #This button's function is defined by command query_click
 result = Text(query_page, wrap= WORD, height =0, width = 0, state = DISABLED)
 table = StringVar(query_page)
@@ -222,7 +238,7 @@ tables_ddown = OptionMenu(query_page, table, *OPTIONS)
 
 
 #Creating the GUI for create table page
-back_button1 = Button(create_page, text='Back', width=30, command=lambda : frameraise(mainwindow))
+back_button1 = Button(create_page, text='Back', width=30, command=on_back_click)
 insert_button = Button(create_page, text='Create Table',width = 30, command=insert_click) #This button's function is defined by command insert_click
 result1 = Text(create_page, wrap= WORD, height =0, width = 0, state = DISABLED)
 #table = StringVar(query_page)
@@ -230,7 +246,7 @@ result1 = Text(create_page, wrap= WORD, height =0, width = 0, state = DISABLED)
 #tables_ddown = OptionMenu(query_page, table, *OPTIONS)
 
 #Creating the GUI for alter table page
-back_button2 = Button(alter_page, text='Back', width=30, command=lambda : frameraise(mainwindow))
+back_button2 = Button(alter_page, text='Back', width=30, command=on_back_click)
 alter_button = Button(alter_page, text='Populate',width = 30, command=alter_click) #This button's function is defined by command alter_click
 result2 = Text(alter_page, wrap= WORD, height =0, width = 0, state = DISABLED)
 targetTable = StringVar(alter_page)
